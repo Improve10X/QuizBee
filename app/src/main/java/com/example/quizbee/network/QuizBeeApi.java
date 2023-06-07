@@ -1,4 +1,4 @@
-package com.example.quizbee;
+package com.example.quizbee.network;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -16,7 +16,7 @@ public class QuizBeeApi {
                 .build();
 
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://crudcrud.com/api/")
+                .baseUrl("https://crudcrud.com/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(client)
                 .build();
