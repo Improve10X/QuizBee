@@ -22,7 +22,7 @@ import retrofit2.Response;
 
 public class QuestionsActivity extends AppCompatActivity {
 
-    private List<QuizBee> quizBeeList = new ArrayList<>();
+    private List<Question> questions = new ArrayList<>();
     private QuestionsAdapter questionsAdapter;
     private QuizBeeApiService quizBeeApiService;
     private ActivityQuestionsBinding binding;
@@ -58,7 +58,7 @@ public class QuestionsActivity extends AppCompatActivity {
             public void onResponse(Call<List<QuizBee>> call, Response<List<QuizBee>> response) {
                 Toast.makeText(QuestionsActivity.this, "FetchItems successfully", Toast.LENGTH_SHORT).show();
                 List<QuizBee> quizBees = response.body();
-                questionsAdapter.setUpData(quizBees);
+                questionsAdapter.setUpData(quizBees.get(0).getQuestionsList());
                 getQuestion(quizBees.get(0).getQuestionsList().get(0));
 
             }
@@ -77,6 +77,12 @@ public class QuestionsActivity extends AppCompatActivity {
 
     private void setUpQuestionsAdapter() {
         questionsAdapter = new QuestionsAdapter();
-        questionsAdapter.setUpData(quizBeeList);
+        questionsAdapter.setUpData(questions);
+        questionsAdapter.setOnItemActionListener(new OnItemActionListener() {
+            @Override
+            public void onClick(Question question) {
+                getQuestion(question);
+            }
+        });
     }
 }

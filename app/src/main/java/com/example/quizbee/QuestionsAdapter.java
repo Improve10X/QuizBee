@@ -7,17 +7,22 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.quizbee.databinding.QuestionsItemBinding;
+import com.example.quizbee.modelclass.Question;
 import com.example.quizbee.modelclass.QuizBee;
 
 import java.util.List;
 
 public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsViewHolder> {
 
-    private List<QuizBee> quizBees;
-
-    void setUpData(List<QuizBee> quizBees) {
+    private List<Question> quizBees;
+    private OnItemActionListener onItemActionListener;
+    void setUpData(List<Question> quizBees) {
         this.quizBees = quizBees;
         notifyDataSetChanged();
+    }
+
+    void setOnItemActionListener(OnItemActionListener onItemActionListener) {
+        this.onItemActionListener = onItemActionListener;
     }
 
     @NonNull
@@ -30,9 +35,11 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull QuestionsViewHolder holder, int position) {
-        QuizBee quizBee = quizBees.get(position);
+        Question question = quizBees.get(position);
         holder.binding.numberTxt.setText(String.valueOf(position + 1));
-
+        holder.binding.getRoot().setOnClickListener(v -> {
+            onItemActionListener.onClick(question);
+        });
     }
 
     @Override
