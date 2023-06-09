@@ -5,6 +5,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Toast;
 
 import com.example.quizbee.databinding.ActivityQuestionsBinding;
@@ -27,6 +28,8 @@ public class QuestionsActivity extends AppCompatActivity {
     private QuizBeeApiService quizBeeApiService;
     private ActivityQuestionsBinding binding;
 
+    private int currentQuestionNumber = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,6 +39,41 @@ public class QuestionsActivity extends AppCompatActivity {
         fetchQuizDetails();
         setUpQuestionsAdapter();
         setUpQuestionsRv();
+        handleNextBtn();
+        handlePreviousBtn();
+    }
+
+    private void handlePreviousBtn() {
+        binding.previousBtn.setOnClickListener(v -> {
+            try {
+                currentQuestionNumber = questionsAdapter.currentQuestionPosition;
+                currentQuestionNumber--;
+                Question question = questions.get(currentQuestionNumber);
+                getQuestionData(question);
+                questionsAdapter.currentQuestionPosition = currentQuestionNumber;
+                questionsAdapter.notifyDataSetChanged();
+
+            } catch (Exception e) {
+                Toast.makeText(this, "There Is No Questions", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
+
+    private void handleNextBtn() {
+        binding.nextBtn.setOnClickListener(v -> {
+            currentQuestionNumber = questionsAdapter.currentQuestionPosition;
+            currentQuestionNumber++;
+            if (currentQuestionNumber == questions.size() - 1) {
+                binding.nextBtn.setVisibility(View.GONE);
+            } else {
+                binding.nextBtn.setVisibility(View.VISIBLE);
+            }
+            Question question = questions.get(currentQuestionNumber);
+            getQuestionData(question);
+            questionsAdapter.currentQuestionPosition = currentQuestionNumber;
+            questionsAdapter.notifyDataSetChanged();
+        });
     }
 
     private void setUpApi() {
@@ -43,7 +81,7 @@ public class QuestionsActivity extends AppCompatActivity {
         quizBeeApiService = quizBeeApi.createQuizBeeService();
     }
 
-    private void getQuestion(Question question) {
+    private void getQuestionData(Question question) {
         binding.questionTxt.setText(question.getQuestion());
         binding.radioButton1Rb.setText(question.getAnswers().get(0));
         binding.radioButton2Rb.setText(question.getAnswers().get(1));
@@ -59,8 +97,8 @@ public class QuestionsActivity extends AppCompatActivity {
                 Toast.makeText(QuestionsActivity.this, "FetchItems successfully", Toast.LENGTH_SHORT).show();
                 List<QuizBee> quizBees = response.body();
                 questionsAdapter.setUpData(quizBees.get(0).getQuestionsList());
-                getQuestion(quizBees.get(0).getQuestionsList().get(0));
-
+                questions = quizBees.get(0).getQuestionsList();
+                getQuestionData(questions.get(0));
             }
 
             @Override
@@ -81,7 +119,7 @@ public class QuestionsActivity extends AppCompatActivity {
         questionsAdapter.setOnItemActionListener(new OnItemActionListener() {
             @Override
             public void onClick(Question question) {
-                getQuestion(question);
+                getQuestionData(question);
             }
         });
     }
